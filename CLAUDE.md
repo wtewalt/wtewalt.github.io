@@ -40,7 +40,9 @@ Four tabs, all rendered in the DOM simultaneously (no fetch needed), toggled wit
 
 ## Design Requirements
 
-- Light and dark mode toggle (CSS variables + vanilla JS, persisted to `localStorage`)
+- Theme selector (CSS variables + vanilla JS, persisted to `localStorage`)
+  - Light: GitHub Light, Tokyo Night Day
+  - Dark: Dracula, Monokai
 - Clean, minimal aesthetic — no excessive color, no gradients
 - Profile photo (`self_pic.png`) displayed in the About Me tab
 - Responsive: readable on mobile and desktop
@@ -209,13 +211,14 @@ Done when: all 8 project cards render cleanly.
 
 ### STEP-05 — Skills tab
 
-Read `skills.yaml` and generate one radar chart per top-level domain key, displayed side by side (stacked on mobile). Each chart uses the skill names as labels and scores (out of 10) as values.
+Read `skills.yaml`. Each top-level key has a `score` (out of 10) and a `sub-skills` list.
 
-Each chart: Chart.js radar type, max scale 10, filled, uses accent color with 0.2 opacity fill and 1.0 border.
+- One radar chart with all top-level skill domains as labels and their scores as values (centered, max-width 560px)
+- Below: sub-skills grouped under their parent domain as pill tags
 
-Below the charts: a grid of skill category pills from the resume (Cloud & Infra, Data Engineering, etc.) with the individual skills listed under each heading — text only, no scores.
+Chart: Chart.js radar type, max scale 10, filled with accent color at 0.2 opacity. Colors read from CSS variables so they update automatically on theme change.
 
-Done when: both charts render correctly in light and dark mode (update Chart.js colors when theme toggles), skill pills display below.
+Done when: chart renders for all themes, sub-skill pills display below grouped correctly.
 
 ### STEP-06 — Polish and Nix flake
 
