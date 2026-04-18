@@ -33,7 +33,8 @@ Three tabs, all rendered in the DOM simultaneously (no fetch needed), toggled wi
 
 1. **About Me** — default/landing tab
 2. **Work History** — employment timeline
-3. **Skills** — radar charts per domain
+3. **Projects** — project cards
+4. **Skills** — radar charts per domain
 
 ---
 
@@ -196,9 +197,14 @@ Render as a vertical timeline:
 - Each employer as a block with company name, title(s), and date range
 - Bullet points for responsibilities (from Work History section above)
 - If a person held multiple titles at one employer, show them stacked with their individual date ranges
-- Project cards at the bottom of the tab (from Projects table above) — simple cards with title, tag pills, duration badge, and description
 
-Done when: all employers and projects render, dates are correct, cards look clean.
+Done when: all employers render, dates are correct.
+
+### STEP-04b — Projects tab
+
+Project cards in a responsive grid (from Projects table above) — each card has title, tag pills, duration badge, and description.
+
+Done when: all 8 project cards render cleanly.
 
 ### STEP-05 — Skills tab
 

@@ -415,6 +415,7 @@
   <div class="container tabs-inner">
     <button class="tab-btn active" onclick="switchTab('about')">About Me</button>
     <button class="tab-btn" onclick="switchTab('work')">Work History</button>
+    <button class="tab-btn" onclick="switchTab('projects')">Projects</button>
     <button class="tab-btn" onclick="switchTab('skills')">Skills</button>
   </div>
 </nav>
@@ -555,9 +556,10 @@
         </div>
       </div>
 
-      <!-- Projects -->
-      <hr class="section-divider" />
-      <h2 class="section-label">Projects</h2>
+    </section>
+
+    <!-- PROJECTS -->
+    <section id="tab-projects">
       <div class="cards-grid">
 
         <div class="card">
@@ -739,7 +741,7 @@
     document.querySelectorAll('section[id^="tab-"]').forEach(s => s.classList.remove('active'));
     document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
     document.getElementById('tab-' + name).classList.add('active');
-    document.querySelectorAll('.tab-btn')[['about','work','skills'].indexOf(name)].classList.add('active');
+    document.querySelectorAll('.tab-btn')[['about','work','projects','skills'].indexOf(name)].classList.add('active');
     if (name === 'skills') initCharts();
   }
 
