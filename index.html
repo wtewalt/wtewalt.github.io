@@ -284,7 +284,7 @@
     /* ── Project Cards ── */
     .cards-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      grid-template-columns: 1fr;
       gap: 1rem;
     }
     .card {
@@ -363,7 +363,7 @@
 
     .skills-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      grid-template-columns: 1fr;
       gap: 1.25rem;
     }
     .skill-group h4 {
@@ -682,6 +682,7 @@
             <span class="skill-pill">SQL</span>
             <span class="skill-pill">JavaScript</span>
             <span class="skill-pill">HCL (Terraform)</span>
+            <span class="skill-pill">Nix</span>
           </div>
         </div>
         <div class="skill-group">
@@ -700,12 +701,27 @@
             <span class="skill-pill">Containers (Docker)</span>
             <span class="skill-pill">Testing &amp; Debugging</span>
             <span class="skill-pill">CI/CD</span>
-            <span class="skill-pill">Cloud Computing</span>
             <span class="skill-pill">Apache Airflow</span>
             <span class="skill-pill">ETLs</span>
-            <span class="skill-pill">Serverless Compute</span>
             <span class="skill-pill">API Development</span>
+          </div>
+        </div>
+        <div class="skill-group">
+          <h4>Frameworks</h4>
+          <div class="skill-pills">
+            <span class="skill-pill">Flask</span>
+            <span class="skill-pill">FastAPI</span>
+            <span class="skill-pill">React</span>
+          </div>
+        </div>
+        <div class="skill-group">
+          <h4>Cloud</h4>
+          <div class="skill-pills">
+            <span class="skill-pill">Serverless Compute</span>
             <span class="skill-pill">S3 &amp; Data Lake</span>
+            <span class="skill-pill">IAM</span>
+            <span class="skill-pill">Secret Management</span>
+            <span class="skill-pill">API Gateway</span>
           </div>
         </div>
         <div class="skill-group">
@@ -783,8 +799,8 @@
 
   // ── Chart.js ──
   const skillsData = {
-    labels: ['Programming','Leadership','Data Engineering','Data Analytics','Data Science','Databases','AI'],
-    scores: [8, 10, 9, 10, 8, 9, 8]
+    labels: ['Programming','Leadership','Data Engineering','Frameworks','Cloud','Data Analytics','Data Science','Databases','AI'],
+    scores: [8, 10, 9, 7, 8, 10, 8, 9, 8]
   };
 
   let skillsChart = null;
