@@ -21,7 +21,6 @@ No bundler, no npm, no build step. All JS loaded from CDN or inlined.
 
 ## Tech Stack
 
-- **Datastar** (`https://cdn.jsdelivr.net/npm/@sudodevnull/datastar`) — reactive signals for tab switching, dark mode, and any interactive state
 - **Chart.js** (`https://cdn.jsdelivr.net/npm/chart.js`) — radar charts for skill domains
 - **CSS** — custom, no framework. Use CSS variables for theming. No Tailwind, no Bootstrap.
 - **HTML5** — semantic markup, `index.html` at repo root
@@ -30,7 +29,7 @@ No bundler, no npm, no build step. All JS loaded from CDN or inlined.
 
 ## Site Structure
 
-Three tabs, all rendered in the DOM simultaneously (no fetch needed), toggled with Datastar signals:
+Three tabs, all rendered in the DOM simultaneously (no fetch needed), toggled with vanilla JS:
 
 1. **About Me** — default/landing tab
 2. **Work History** — employment timeline
@@ -40,7 +39,7 @@ Three tabs, all rendered in the DOM simultaneously (no fetch needed), toggled wi
 
 ## Design Requirements
 
-- Light and dark mode toggle (CSS variables + Datastar signal, persisted to `localStorage`)
+- Light and dark mode toggle (CSS variables + vanilla JS, persisted to `localStorage`)
 - Clean, minimal aesthetic — no excessive color, no gradients
 - Profile photo (`self_pic.png`) displayed in the About Me tab
 - Responsive: readable on mobile and desktop
@@ -158,8 +157,8 @@ Execute each step fully before moving to the next.
 ### STEP-01 — HTML skeleton
 
 Create `index.html` with:
-- `<head>`: charset, viewport, title ("William Tewalt"), CDN links for Datastar and Chart.js, inline `<style>` block (empty for now)
-- `<body data-store='{"tab":"about","dark":false}'>` — Datastar root store
+- `<head>`: charset, viewport, title ("William Tewalt"), CDN link for Chart.js, inline `<style>` block (empty for now)
+- `<body>` with vanilla JS handling tab state and dark mode
 - Top nav bar: name/logo left, theme toggle button right
 - Tab buttons: About Me, Work History, Skills — each sets `tab` signal on click
 - Three `<section>` elements with `data-show` bound to the `tab` signal
@@ -171,14 +170,14 @@ Done when: page loads, tabs switch, no JS errors in console.
 
 Fill the `<style>` block with:
 - CSS variables for light mode (`:root`) and dark mode (`.dark` on `<body>`)
-- Datastar-driven dark mode: `data-class='{"dark": dark}'` on `<body>`
+- Dark mode: `toggleDark()` adds/removes `.dark` class on `<body>`
 - Base styles: body, fonts (system font stack), layout (max-width ~900px, centered)
 - Nav bar styles
 - Tab button styles with active state
 - Section layout
 - Responsive: single-column on mobile
 
-Done when: light/dark toggle works; `localStorage` persistence via Datastar `data-on-load` reads saved preference.
+Done when: light/dark toggle works; `localStorage` preference restored on page load.
 
 ### STEP-03 — About Me tab
 
