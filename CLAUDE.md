@@ -150,7 +150,7 @@ Also surface these from the resume as text (not on radar charts — too many ite
 | AI Chat Interface | GenAI · Data Engineering | 1 yr | MCP-based tool enabling Claude AI to directly query and interact with internal database tables |
 | Ad Generation | GenAI · Data Engineering | 3 yr | LLM-driven generation of search ad copy using dynamic performance data; custom web UI with user-defined theme inputs |
 | Geo-Targeting | Data Science · Data Engineering | 2 yr | Geospatial + Google Places API tool tracking business rankings across city subsections over time; cloud object storage for pipeline I/O |
-| Timeo | Open Source | — | Python package published on PyPI |
+| Timeo | Open Source | — | Python package published on PyPI. Link: https://pypi.org/project/timeo/ |
 
 ---
 
