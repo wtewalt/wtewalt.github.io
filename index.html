@@ -4,7 +4,6 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>William Tewalt</title>
-  <script type="module" src="https://cdn.jsdelivr.net/npm/@sudodevnull/datastar"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     /* ── CSS Variables ── */
@@ -401,42 +400,22 @@
     }
   </style>
 </head>
-<body
-  data-store='{"tab":"about","dark":false}'
-  data-class='{"dark": dark}'
-  data-on-load="dark = localStorage.getItem('dark') === 'true'"
->
+<body>
 
 <!-- ── Header ── -->
 <header>
   <div class="container nav-inner">
     <span class="nav-logo">William Tewalt</span>
-    <button
-      class="theme-toggle"
-      data-on-click="dark = !dark; localStorage.setItem('dark', dark)"
-      data-text="dark ? '☀ Light' : '☾ Dark'"
-    >☾ Dark</button>
+    <button class="theme-toggle" id="theme-toggle" onclick="toggleDark()">☾ Dark</button>
   </div>
 </header>
 
 <!-- ── Tab Navigation ── -->
 <nav class="tabs">
   <div class="container tabs-inner">
-    <button
-      class="tab-btn"
-      data-class='{"active": tab === "about"}'
-      data-on-click='tab = "about"'
-    >About Me</button>
-    <button
-      class="tab-btn"
-      data-class='{"active": tab === "work"}'
-      data-on-click='tab = "work"'
-    >Work History</button>
-    <button
-      class="tab-btn"
-      data-class='{"active": tab === "skills"}'
-      data-on-click='tab = "skills"; initCharts()'
-    >Skills</button>
+    <button class="tab-btn active" onclick="switchTab('about')">About Me</button>
+    <button class="tab-btn" onclick="switchTab('work')">Work History</button>
+    <button class="tab-btn" onclick="switchTab('skills')">Skills</button>
   </div>
 </nav>
 
@@ -445,7 +424,7 @@
   <div class="container">
 
     <!-- ABOUT ME -->
-    <section id="tab-about" data-class='{"active": tab === "about"}'>
+    <section id="tab-about" class="active">
       <div class="about-header">
         <img class="profile-photo" src="self_pic.png" alt="William Tewalt" />
         <div class="about-intro">
@@ -488,7 +467,7 @@
     </section>
 
     <!-- WORK HISTORY -->
-    <section id="tab-work" data-class='{"active": tab === "work"}'>
+    <section id="tab-work">
       <div class="timeline">
 
         <!-- EPL Digital + AttorneySync -->
@@ -657,7 +636,7 @@
     </section>
 
     <!-- SKILLS -->
-    <section id="tab-skills" data-class='{"active": tab === "skills"}'>
+    <section id="tab-skills">
       <div class="charts-row">
         <div class="chart-card">
           <h3>Programming</h3>
@@ -747,6 +726,27 @@
 </footer>
 
 <script>
+  // ── Tab switching ──
+  function switchTab(name) {
+    document.querySelectorAll('section[id^="tab-"]').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('tab-' + name).classList.add('active');
+    document.querySelectorAll('.tab-btn')[['about','work','skills'].indexOf(name)].classList.add('active');
+    if (name === 'skills') initCharts();
+  }
+
+  // ── Dark mode ──
+  function toggleDark() {
+    const isDark = document.body.classList.toggle('dark');
+    localStorage.setItem('dark', isDark);
+    document.getElementById('theme-toggle').textContent = isDark ? '☀ Light' : '☾ Dark';
+    updateChartColors();
+  }
+  if (localStorage.getItem('dark') === 'true') {
+    document.body.classList.add('dark');
+    document.getElementById('theme-toggle').textContent = '☀ Light';
+  }
+
   // ── Chart.js radar chart initialization ──
   // Data from skills.yaml:
   // Programming: python=8, go=5, javascript=6, hcl=6
