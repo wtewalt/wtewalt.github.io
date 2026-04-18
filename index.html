@@ -646,6 +646,14 @@
           <h3>Leadership</h3>
           <canvas id="chart-leadership"></canvas>
         </div>
+        <div class="chart-card">
+          <h3>Data Analytics</h3>
+          <canvas id="chart-data-analytics"></canvas>
+        </div>
+        <div class="chart-card">
+          <h3>Data Engineering</h3>
+          <canvas id="chart-data-engineering"></canvas>
+        </div>
       </div>
 
       <hr class="section-divider" />
@@ -753,16 +761,26 @@
   // Leadership: communication=9, empathy=10, decision-making=9, conflict resolution=9, strategic planning=10
 
   const programmingData = {
-    labels: ['Python', 'Go', 'JavaScript', 'HCL'],
-    scores: [8, 5, 6, 6]
+    labels: ['Python', 'Go', 'JavaScript', 'HCL (Terraform)', 'SQL'],
+    scores: [8, 5, 6, 6, 9]
   };
   const leadershipData = {
     labels: ['Communication', 'Empathy', 'Decision-Making', 'Conflict Resolution', 'Strategic Planning'],
     scores: [9, 10, 9, 9, 10]
   };
+  const dataAnalyticsData = {
+    labels: ['Forecasting', 'AI', 'Optimization', 'BI', 'Visualization'],
+    scores: [9, 8, 8, 9, 9]
+  };
+  const dataEngineeringData = {
+    labels: ['Git', 'Containers', 'Testing & Debugging', 'CI/CD', 'Cloud Computing'],
+    scores: [8, 7, 8, 9, 9]
+  };
 
   let programmingChart = null;
   let leadershipChart = null;
+  let dataAnalyticsChart = null;
+  let dataEngineeringChart = null;
   let chartsInitialized = false;
 
   function getChartColors() {
@@ -869,21 +887,17 @@
     if (chartsInitialized) return;
     chartsInitialized = true;
 
-    programmingChart = new Chart(
-      document.getElementById('chart-programming'),
-      makeConfig(programmingData)
-    );
-    leadershipChart = new Chart(
-      document.getElementById('chart-leadership'),
-      makeConfig(leadershipData)
-    );
+    programmingChart = new Chart(document.getElementById('chart-programming'), makeConfig(programmingData));
+    leadershipChart = new Chart(document.getElementById('chart-leadership'), makeConfig(leadershipData));
+    dataAnalyticsChart = new Chart(document.getElementById('chart-data-analytics'), makeConfig(dataAnalyticsData));
+    dataEngineeringChart = new Chart(document.getElementById('chart-data-engineering'), makeConfig(dataEngineeringData));
   }
 
   function updateChartColors() {
     if (!chartsInitialized) return;
     const c = getChartColors();
 
-    [programmingChart, leadershipChart].forEach(chart => {
+    [programmingChart, leadershipChart, dataAnalyticsChart, dataEngineeringChart].forEach(chart => {
       chart.data.datasets[0].backgroundColor = hexToRgba(c.accent, 0.2);
       chart.data.datasets[0].borderColor = c.accent;
       chart.data.datasets[0].pointBackgroundColor = c.accent;
