@@ -1,0 +1,904 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>William Tewalt</title>
+  <script type="module" src="https://cdn.jsdelivr.net/npm/@sudodevnull/datastar"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    /* ── CSS Variables ── */
+    :root {
+      --bg: #f9f9f7;
+      --surface: #ffffff;
+      --border: #e0e0e0;
+      --text: #1a1a1a;
+      --text-muted: #666666;
+      --accent: #2c6fad;
+    }
+    body.dark {
+      --bg: #111111;
+      --surface: #1e1e1e;
+      --border: #333333;
+      --text: #f0f0f0;
+      --text-muted: #999999;
+      --accent: #5b9bd5;
+    }
+
+    /* ── Base ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-size: 16px;
+      line-height: 1.6;
+      transition: background 0.2s, color 0.2s;
+      min-height: 100vh;
+    }
+
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    /* ── Layout ── */
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 0 1.25rem;
+    }
+
+    /* ── Nav ── */
+    header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      transition: background 0.2s, border-color 0.2s;
+    }
+    .nav-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 56px;
+    }
+    .nav-logo {
+      font-weight: 700;
+      font-size: 1.1rem;
+      color: var(--text);
+    }
+    .theme-toggle {
+      background: none;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 0.3rem 0.7rem;
+      cursor: pointer;
+      color: var(--text);
+      font-size: 0.9rem;
+      transition: background 0.15s, border-color 0.2s, color 0.2s;
+    }
+    .theme-toggle:hover { background: var(--bg); }
+
+    /* ── Tabs ── */
+    .tabs {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      transition: background 0.2s, border-color 0.2s;
+    }
+    .tabs-inner {
+      display: flex;
+      gap: 0;
+    }
+    .tab-btn {
+      background: none;
+      border: none;
+      border-bottom: 3px solid transparent;
+      padding: 0.85rem 1.25rem;
+      cursor: pointer;
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      font-family: inherit;
+      transition: color 0.15s, border-color 0.15s;
+    }
+    .tab-btn:hover { color: var(--text); }
+    .tab-btn.active {
+      color: var(--accent);
+      border-bottom-color: var(--accent);
+      font-weight: 600;
+    }
+
+    /* ── Main content ── */
+    main { padding: 2rem 0 3rem; }
+
+    section { display: none; }
+    section.active { display: block; }
+
+    /* ── About Me ── */
+    .about-header {
+      display: flex;
+      align-items: flex-start;
+      gap: 1.75rem;
+      margin-bottom: 2rem;
+    }
+    .profile-photo {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 3px solid var(--border);
+      flex-shrink: 0;
+    }
+    .about-intro h1 {
+      font-size: 1.75rem;
+      font-weight: 700;
+      line-height: 1.2;
+      margin-bottom: 0.25rem;
+    }
+    .about-intro .subtitle {
+      font-size: 1rem;
+      color: var(--text-muted);
+      margin-bottom: 0.75rem;
+    }
+    .contact-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem 1.25rem;
+      font-size: 0.9rem;
+    }
+    .contact-links a {
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+      color: var(--text-muted);
+      transition: color 0.15s;
+    }
+    .contact-links a:hover { color: var(--accent); text-decoration: none; }
+    .contact-links svg { width: 15px; height: 15px; flex-shrink: 0; }
+
+    .bio {
+      font-size: 0.975rem;
+      color: var(--text);
+      margin-bottom: 1.5rem;
+      line-height: 1.7;
+    }
+
+    .callout {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-left: 4px solid var(--accent);
+      border-radius: 6px;
+      padding: 1rem 1.25rem;
+      transition: background 0.2s, border-color 0.2s;
+    }
+    .callout h3 {
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-muted);
+      margin-bottom: 0.5rem;
+    }
+    .callout ul {
+      list-style: none;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+    }
+    .callout ul li {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 100px;
+      padding: 0.2rem 0.7rem;
+      font-size: 0.875rem;
+      color: var(--text);
+      transition: background 0.2s;
+    }
+
+    /* ── Work History ── */
+    .timeline { position: relative; }
+    .timeline::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 6px;
+      bottom: 0;
+      width: 2px;
+      background: var(--border);
+    }
+    .employer {
+      position: relative;
+      padding-left: 1.75rem;
+      margin-bottom: 2.5rem;
+    }
+    .employer::before {
+      content: '';
+      position: absolute;
+      left: -4px;
+      top: 6px;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--accent);
+      border: 2px solid var(--bg);
+      transition: background 0.2s, border-color 0.2s;
+    }
+    .employer-name {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 0.4rem;
+    }
+    .roles { margin-bottom: 0.75rem; }
+    .role {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      flex-wrap: wrap;
+      gap: 0.25rem;
+    }
+    .role-title {
+      font-weight: 600;
+      font-size: 0.95rem;
+      color: var(--accent);
+    }
+    .role-dates {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+    .employer ul {
+      padding-left: 1.1rem;
+      font-size: 0.925rem;
+      color: var(--text-muted);
+      line-height: 1.65;
+    }
+    .employer ul li { margin-bottom: 0.25rem; }
+
+    .section-divider {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 2.5rem 0 2rem;
+    }
+    .section-label {
+      font-size: 1.15rem;
+      font-weight: 700;
+      margin-bottom: 1.25rem;
+      color: var(--text);
+    }
+
+    /* ── Project Cards ── */
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 1rem;
+    }
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.1rem 1.25rem;
+      transition: background 0.2s, border-color 0.2s;
+    }
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 0.5rem;
+      margin-bottom: 0.6rem;
+    }
+    .card-title {
+      font-weight: 700;
+      font-size: 0.975rem;
+      color: var(--text);
+    }
+    .duration-badge {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 0.1rem 0.45rem;
+      font-size: 0.775rem;
+      color: var(--text-muted);
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.3rem;
+      margin-bottom: 0.65rem;
+    }
+    .tag {
+      background: color-mix(in srgb, var(--accent) 15%, transparent);
+      color: var(--accent);
+      border-radius: 100px;
+      padding: 0.1rem 0.55rem;
+      font-size: 0.775rem;
+      font-weight: 500;
+    }
+    .card-desc {
+      font-size: 0.875rem;
+      color: var(--text-muted);
+      line-height: 1.55;
+    }
+
+    /* ── Skills ── */
+    .charts-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+    .chart-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.25rem;
+      transition: background 0.2s, border-color 0.2s;
+    }
+    .chart-card h3 {
+      font-size: 0.9rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      margin-bottom: 0.75rem;
+      text-align: center;
+    }
+    .chart-card canvas { max-height: 280px; }
+
+    .skills-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1.25rem;
+    }
+    .skill-group h4 {
+      font-size: 0.85rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      margin-bottom: 0.5rem;
+    }
+    .skill-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.3rem;
+    }
+    .skill-pill {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 100px;
+      padding: 0.2rem 0.65rem;
+      font-size: 0.825rem;
+      color: var(--text);
+      transition: background 0.2s, border-color 0.2s;
+    }
+
+    /* ── Footer ── */
+    footer {
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      padding: 1.25rem 0;
+      text-align: center;
+      font-size: 0.875rem;
+      color: var(--text-muted);
+      transition: background 0.2s, border-color 0.2s;
+    }
+    footer a { color: var(--text-muted); }
+    footer a:hover { color: var(--accent); }
+
+    /* ── Responsive ── */
+    @media (max-width: 600px) {
+      .about-header {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+      }
+      .contact-links { justify-content: center; }
+      .role { flex-direction: column; }
+      .timeline::before { left: 0; }
+      .employer { padding-left: 1.5rem; }
+      .charts-row { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body
+  data-store='{"tab":"about","dark":false}'
+  data-class='{"dark": dark}'
+  data-on-load="dark = localStorage.getItem('dark') === 'true'"
+>
+
+<!-- ── Header ── -->
+<header>
+  <div class="container nav-inner">
+    <span class="nav-logo">William Tewalt</span>
+    <button
+      class="theme-toggle"
+      data-on-click="dark = !dark; localStorage.setItem('dark', dark)"
+      data-text="dark ? '☀ Light' : '☾ Dark'"
+    >☾ Dark</button>
+  </div>
+</header>
+
+<!-- ── Tab Navigation ── -->
+<nav class="tabs">
+  <div class="container tabs-inner">
+    <button
+      class="tab-btn"
+      data-class='{"active": tab === "about"}'
+      data-on-click='tab = "about"'
+    >About Me</button>
+    <button
+      class="tab-btn"
+      data-class='{"active": tab === "work"}'
+      data-on-click='tab = "work"'
+    >Work History</button>
+    <button
+      class="tab-btn"
+      data-class='{"active": tab === "skills"}'
+      data-on-click='tab = "skills"; initCharts()'
+    >Skills</button>
+  </div>
+</nav>
+
+<!-- ── Main ── -->
+<main>
+  <div class="container">
+
+    <!-- ABOUT ME -->
+    <section id="tab-about" data-class='{"active": tab === "about"}'>
+      <div class="about-header">
+        <img class="profile-photo" src="self_pic.png" alt="William Tewalt" />
+        <div class="about-intro">
+          <h1>William Tewalt</h1>
+          <p class="subtitle">Sr. Director of Data &amp; Analytics</p>
+          <div class="contact-links">
+            <span style="color:var(--text-muted);display:flex;align-items:center;gap:0.3rem;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+              Signal Mountain, TN
+            </span>
+            <a href="mailto:wtewalt@gmail.com">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><polyline points="2,4 12,13 22,4"/></svg>
+              wtewalt@gmail.com
+            </a>
+            <a href="https://linkedin.com/in/william-tewalt" target="_blank" rel="noopener">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+              linkedin.com/in/william-tewalt
+            </a>
+            <a href="https://github.com/wtewalt" target="_blank" rel="noopener">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
+              github.com/wtewalt
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <p class="bio">
+        Senior data and analytics leader with 10+ years of experience building production data infrastructure, ML systems, and AI-powered tools. Has led teams and initiatives spanning data engineering, data science, and full-stack software development across agency, startup, and enterprise environments. Builds things end-to-end: from Airflow pipelines and medallion architectures to recommendation systems, web apps, and LLM integrations. Currently targeting senior leadership roles in Data Engineering, Software Development, or Data.
+      </p>
+
+      <div class="callout">
+        <h3>Currently open to</h3>
+        <ul>
+          <li>Sr. Director / VP of Data Engineering</li>
+          <li>Sr. Director / VP of Software Development</li>
+          <li>Head of Data / Chief Data Officer</li>
+          <li>Principal Data Engineer</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- WORK HISTORY -->
+    <section id="tab-work" data-class='{"active": tab === "work"}'>
+      <div class="timeline">
+
+        <!-- EPL Digital + AttorneySync -->
+        <div class="employer">
+          <div class="employer-name">EPL Digital + AttorneySync</div>
+          <div class="roles">
+            <div class="role">
+              <span class="role-title">Sr. Director of Data &amp; Analytics</span>
+              <span class="role-dates">2025–Present</span>
+            </div>
+            <div class="role">
+              <span class="role-title">Director of Data &amp; Analytics</span>
+              <span class="role-dates">2020–2025</span>
+            </div>
+          </div>
+          <ul>
+            <li>Architected medallion data infrastructure; established IaC, version control, and system-as-code as core data strategy pillars</li>
+            <li>Built custom ML-driven recommendation system optimizing ~$4M in annual advertising spend via automated bid/budget management (10% ROAS improvement)</li>
+            <li>Built PII-safe proprietary data processing tools and internal APIs powering internally hosted ML/AI applications</li>
+            <li>Launched a secure web app with cloud identity provider integration to expose internal ML/AI tools</li>
+            <li>Used AWS Lambda for scheduled pipeline execution across AWS and GCP</li>
+            <li>Consolidated siloed data into unified performance dashboards</li>
+          </ul>
+        </div>
+
+        <!-- The Johnson Group -->
+        <div class="employer">
+          <div class="employer-name">The Johnson Group</div>
+          <div class="roles">
+            <div class="role">
+              <span class="role-title">Director of Analytics</span>
+              <span class="role-dates">2020</span>
+            </div>
+            <div class="role">
+              <span class="role-title">Manager, Advanced Analytics</span>
+              <span class="role-dates">2017–2020</span>
+            </div>
+          </div>
+          <ul>
+            <li>Built and orchestrated automated data pipelines in Python and Apache Airflow across all client accounts</li>
+            <li>Developed media attribution models guiding optimization of millions in annual ad spend</li>
+            <li>Designed and maintained PostgreSQL database as foundation for company-wide analytics</li>
+            <li>Established scalable development guidelines enabling efficient cross-team support</li>
+            <li>Built internal and client-facing dashboards for data visualization and performance reporting</li>
+          </ul>
+        </div>
+
+        <!-- Bellhop -->
+        <div class="employer">
+          <div class="employer-name">Bellhop</div>
+          <div class="roles">
+            <div class="role">
+              <span class="role-title">Data / Business Intelligence Analyst</span>
+              <span class="role-dates">2016–2017</span>
+            </div>
+          </div>
+          <ul>
+            <li>Deployed order simulation methodology to AWS Lambda for financial goal modeling</li>
+            <li>Integrated third-party APIs for digital campaign attribution data ingestion</li>
+            <li>Analyzed census data in AWS Redshift to generate market expansion recommendations for C-suite</li>
+            <li>Built interactive geospatial visualizations for identifying market hotspots</li>
+            <li>Partnered with software engineers to design and deploy a platform gamification framework via AWS Lambda</li>
+          </ul>
+        </div>
+
+        <!-- UNUM -->
+        <div class="employer">
+          <div class="employer-name">UNUM</div>
+          <div class="roles">
+            <div class="role">
+              <span class="role-title">Data Analytics Consultant, Enterprise Audit</span>
+              <span class="role-dates">2016</span>
+            </div>
+            <div class="role">
+              <span class="role-title">Metrics and Reporting Analyst</span>
+              <span class="role-dates">2014–2016</span>
+            </div>
+          </div>
+          <ul>
+            <li>Built predictive models for forecasting, behavioral analysis, and risk scoring/clustering</li>
+            <li>Applied statistical methods, simulation, and data mining techniques to complex business questions</li>
+            <li>Designed staffing projection and service delivery estimation methodology</li>
+            <li>Automated interactive reports and dashboards supporting contact center operations</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Projects -->
+      <hr class="section-divider" />
+      <h2 class="section-label">Projects</h2>
+      <div class="cards-grid">
+
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Campaign Optimization</span>
+            <span class="duration-badge">3 yr</span>
+          </div>
+          <div class="tags"><span class="tag">Data Science</span></div>
+          <p class="card-desc">Self-hosted recommendation system automating bid and budget management across ~$4M annual ad spend; increased client ROAS by 10%.</p>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Data Pipelines</span>
+            <span class="duration-badge">5 yr</span>
+          </div>
+          <div class="tags"><span class="tag">Data Engineering</span></div>
+          <p class="card-desc">Apache Airflow orchestration ingesting data from dozens of sources (CRMs, ad platforms, SFTP, APIs); backed by custom Python packaging and cloud infra.</p>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Data Management</span>
+            <span class="duration-badge">5 yr</span>
+          </div>
+          <div class="tags"><span class="tag">Data Engineering</span></div>
+          <p class="card-desc">Medallion architecture across AWS Redshift, PostgreSQL, and BigQuery; implemented SQLMesh org-wide for data lineage and isolated dev/prod environments.</p>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Web App</span>
+            <span class="duration-badge">3 yr</span>
+          </div>
+          <div class="tags"><span class="tag">Software Engineering</span></div>
+          <p class="card-desc">Full-stack app in Django + Next.js for hosting internal data science tools; integrated with internal and external APIs.</p>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">AI Chat Interface</span>
+            <span class="duration-badge">1 yr</span>
+          </div>
+          <div class="tags"><span class="tag">GenAI</span><span class="tag">Data Engineering</span></div>
+          <p class="card-desc">MCP-based tool enabling Claude AI to directly query and interact with internal database tables.</p>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Ad Generation</span>
+            <span class="duration-badge">3 yr</span>
+          </div>
+          <div class="tags"><span class="tag">GenAI</span><span class="tag">Data Engineering</span></div>
+          <p class="card-desc">LLM-driven generation of search ad copy using dynamic performance data; custom web UI with user-defined theme inputs.</p>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Geo-Targeting</span>
+            <span class="duration-badge">2 yr</span>
+          </div>
+          <div class="tags"><span class="tag">Data Science</span><span class="tag">Data Engineering</span></div>
+          <p class="card-desc">Geospatial + Google Places API tool tracking business rankings across city subsections over time; cloud object storage for pipeline I/O.</p>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Timeo</span>
+            <span class="duration-badge">—</span>
+          </div>
+          <div class="tags"><span class="tag">Open Source</span></div>
+          <p class="card-desc">Python package published on PyPI.</p>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- SKILLS -->
+    <section id="tab-skills" data-class='{"active": tab === "skills"}'>
+      <div class="charts-row">
+        <div class="chart-card">
+          <h3>Programming</h3>
+          <canvas id="chart-programming"></canvas>
+        </div>
+        <div class="chart-card">
+          <h3>Leadership</h3>
+          <canvas id="chart-leadership"></canvas>
+        </div>
+      </div>
+
+      <hr class="section-divider" />
+      <h2 class="section-label">Technology &amp; Domains</h2>
+
+      <div class="skills-grid">
+        <div class="skill-group">
+          <h4>Cloud &amp; Infra</h4>
+          <div class="skill-pills">
+            <span class="skill-pill">AWS Lambda</span>
+            <span class="skill-pill">AWS Redshift</span>
+            <span class="skill-pill">S3</span>
+            <span class="skill-pill">GCP</span>
+            <span class="skill-pill">BigQuery</span>
+            <span class="skill-pill">GCS</span>
+            <span class="skill-pill">Docker</span>
+            <span class="skill-pill">Terraform</span>
+            <span class="skill-pill">CI/CD</span>
+          </div>
+        </div>
+        <div class="skill-group">
+          <h4>Data Engineering</h4>
+          <div class="skill-pills">
+            <span class="skill-pill">Apache Airflow</span>
+            <span class="skill-pill">SQLMesh</span>
+            <span class="skill-pill">dbt</span>
+            <span class="skill-pill">ETL/ELT</span>
+            <span class="skill-pill">Medallion Architecture</span>
+          </div>
+        </div>
+        <div class="skill-group">
+          <h4>Data Science &amp; ML</h4>
+          <div class="skill-pills">
+            <span class="skill-pill">Recommendation Systems</span>
+            <span class="skill-pill">Predictive Modeling</span>
+            <span class="skill-pill">Media Attribution</span>
+            <span class="skill-pill">NLP</span>
+            <span class="skill-pill">Forecasting</span>
+          </div>
+        </div>
+        <div class="skill-group">
+          <h4>AI &amp; GenAI</h4>
+          <div class="skill-pills">
+            <span class="skill-pill">LLM Integration</span>
+            <span class="skill-pill">Prompt Engineering</span>
+            <span class="skill-pill">MCP Development</span>
+          </div>
+        </div>
+        <div class="skill-group">
+          <h4>Databases</h4>
+          <div class="skill-pills">
+            <span class="skill-pill">PostgreSQL</span>
+            <span class="skill-pill">AWS Redshift</span>
+            <span class="skill-pill">Google BigQuery</span>
+          </div>
+        </div>
+        <div class="skill-group">
+          <h4>Visualization</h4>
+          <div class="skill-pills">
+            <span class="skill-pill">Power BI</span>
+            <span class="skill-pill">Tableau</span>
+            <span class="skill-pill">Geospatial Visualization</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </div><!-- /.container -->
+</main>
+
+<!-- ── Footer ── -->
+<footer>
+  <div class="container">
+    <a href="mailto:wtewalt@gmail.com">wtewalt@gmail.com</a>
+    &nbsp;·&nbsp;
+    <a href="https://linkedin.com/in/william-tewalt" target="_blank" rel="noopener">linkedin.com/in/william-tewalt</a>
+  </div>
+</footer>
+
+<script>
+  // ── Chart.js radar chart initialization ──
+  // Data from skills.yaml:
+  // Programming: python=8, go=5, javascript=6, hcl=6
+  // Leadership: communication=9, empathy=10, decision-making=9, conflict resolution=9, strategic planning=10
+
+  const programmingData = {
+    labels: ['Python', 'Go', 'JavaScript', 'HCL'],
+    scores: [8, 5, 6, 6]
+  };
+  const leadershipData = {
+    labels: ['Communication', 'Empathy', 'Decision-Making', 'Conflict Resolution', 'Strategic Planning'],
+    scores: [9, 10, 9, 9, 10]
+  };
+
+  let programmingChart = null;
+  let leadershipChart = null;
+  let chartsInitialized = false;
+
+  function getChartColors() {
+    const isDark = document.body.classList.contains('dark');
+    return {
+      accent: isDark ? '#5b9bd5' : '#2c6fad',
+      gridColor: isDark ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.1)',
+      tickColor: isDark ? '#999999' : '#666666',
+      labelColor: isDark ? '#f0f0f0' : '#1a1a1a',
+      pointLabel: isDark ? '#f0f0f0' : '#1a1a1a',
+    };
+  }
+
+  function makeChartConfig(data) {
+    const c = getChartColors();
+    return {
+      type: 'radar',
+      data: {
+        labels: data.labels,
+        datasets: [{
+          data: data.scores,
+          backgroundColor: c.accent.replace(')', ', 0.2)').replace('rgb', 'rgba').replace('#', 'rgba(').replace('rgba(', 'rgba(').replace(/rgba\(([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})/i, (_, r, g, b) =>
+            `rgba(${parseInt(r,16)},${parseInt(g,16)},${parseInt(b,16)}`),
+          borderColor: c.accent,
+          borderWidth: 2,
+          pointBackgroundColor: c.accent,
+          pointRadius: 4,
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: { legend: { display: false } },
+        scales: {
+          r: {
+            min: 0,
+            max: 10,
+            ticks: {
+              stepSize: 2,
+              color: c.tickColor,
+              backdropColor: 'transparent',
+              font: { size: 11 }
+            },
+            grid: { color: c.gridColor },
+            angleLines: { color: c.gridColor },
+            pointLabels: {
+              color: c.pointLabel,
+              font: { size: 12 }
+            }
+          }
+        }
+      }
+    };
+  }
+
+  // Helper: convert hex to rgba string
+  function hexToRgba(hex, alpha) {
+    const r = parseInt(hex.slice(1, 3), 16);
+    const g = parseInt(hex.slice(3, 5), 16);
+    const b = parseInt(hex.slice(5, 7), 16);
+    return `rgba(${r},${g},${b},${alpha})`;
+  }
+
+  function makeConfig(data) {
+    const c = getChartColors();
+    return {
+      type: 'radar',
+      data: {
+        labels: data.labels,
+        datasets: [{
+          data: data.scores,
+          backgroundColor: hexToRgba(c.accent, 0.2),
+          borderColor: c.accent,
+          borderWidth: 2,
+          pointBackgroundColor: c.accent,
+          pointRadius: 4,
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: { legend: { display: false } },
+        scales: {
+          r: {
+            min: 0,
+            max: 10,
+            ticks: {
+              stepSize: 2,
+              color: c.tickColor,
+              backdropColor: 'transparent',
+              font: { size: 11 }
+            },
+            grid: { color: c.gridColor },
+            angleLines: { color: c.gridColor },
+            pointLabels: {
+              color: c.pointLabel,
+              font: { size: 12 }
+            }
+          }
+        }
+      }
+    };
+  }
+
+  function initCharts() {
+    if (chartsInitialized) return;
+    chartsInitialized = true;
+
+    programmingChart = new Chart(
+      document.getElementById('chart-programming'),
+      makeConfig(programmingData)
+    );
+    leadershipChart = new Chart(
+      document.getElementById('chart-leadership'),
+      makeConfig(leadershipData)
+    );
+  }
+
+  function updateChartColors() {
+    if (!chartsInitialized) return;
+    const c = getChartColors();
+
+    [programmingChart, leadershipChart].forEach(chart => {
+      chart.data.datasets[0].backgroundColor = hexToRgba(c.accent, 0.2);
+      chart.data.datasets[0].borderColor = c.accent;
+      chart.data.datasets[0].pointBackgroundColor = c.accent;
+      chart.options.scales.r.ticks.color = c.tickColor;
+      chart.options.scales.r.grid.color = c.gridColor;
+      chart.options.scales.r.angleLines.color = c.gridColor;
+      chart.options.scales.r.pointLabels.color = c.pointLabel;
+      chart.update();
+    });
+  }
+
+  // Watch for dark mode class changes to update chart colors
+  const observer = new MutationObserver(() => updateChartColors());
+  observer.observe(document.body, { attributes: true, attributeFilter: ['class'] });
+</script>
+
+</body>
+</html>
