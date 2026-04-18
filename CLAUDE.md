@@ -29,7 +29,7 @@ No bundler, no npm, no build step. All JS loaded from CDN or inlined.
 
 ## Site Structure
 
-Three tabs, all rendered in the DOM simultaneously (no fetch needed), toggled with vanilla JS:
+Four tabs, all rendered in the DOM simultaneously (no fetch needed), toggled with vanilla JS:
 
 1. **About Me** — default/landing tab
 2. **Work History** — employment timeline
@@ -104,17 +104,17 @@ Also surface these from the resume as text (not on radar charts — too many ite
 **EPL Digital + AttorneySync**
 - Sr. Director of Data & Analytics — 2025–Present
 - Director of Data & Analytics — 2020–2025
+- Manage a team of experts across multiple data domains.
 - Architected medallion data infrastructure; established IaC, version control, and system-as-code as core data strategy pillars
-- Built custom ML-driven recommendation system optimizing ~$4M in annual advertising spend via automated bid/budget management (10% ROAS improvement)
-- Built PII-safe proprietary data processing tools and internal APIs powering internally hosted ML/AI applications
+- Built custom ML-driven recommendation system optimizing ~$4M in annual advertising spend via automated bid/budget management leading to a 20% increase in ROI
 - Launched a secure web app with cloud identity provider integration to expose internal ML/AI tools
-- Used AWS Lambda for scheduled pipeline execution across AWS and GCP
+- Built PII-safe proprietary data processing tools and internal APIs powering internally hosted ML/AI applications
 - Consolidated siloed data into unified performance dashboards
 
 **The Johnson Group**
 - Director of Analytics — 2020
 - Manager, Advanced Analytics — 2017–2020
-- Built and orchestrated automated data pipelines in Python and Apache Airflow across all client accounts
+- Built and orchestrated automated data pipelines with  Python and Apache Airflow 
 - Developed media attribution models guiding optimization of millions in annual ad spend
 - Designed and maintained PostgreSQL database as foundation for company-wide analytics
 - Established scalable development guidelines enabling efficient cross-team support
@@ -122,16 +122,17 @@ Also surface these from the resume as text (not on radar charts — too many ite
 
 **Bellhop**
 - Data / Business Intelligence Analyst — 2016–2017
-- Deployed order simulation methodology to AWS Lambda for financial goal modeling
-- Integrated third-party APIs for digital campaign attribution data ingestion
+- Developed the statistical models core to operational efficiency and growth
 - Analyzed census data in AWS Redshift to generate market expansion recommendations for C-suite
+- Developed operational models used as the basis for platform gamification
 - Built interactive geospatial visualizations for identifying market hotspots
-- Partnered with software engineers to design and deploy a platform gamification framework via AWS Lambda
+- Designed company-wide dashboards delivering cross-functional performance insights
 
 **UNUM**
 - Data Analytics Consultant, Enterprise Audit — 2016
 - Metrics and Reporting Analyst — 2014–2016
-- Built predictive models for forecasting, behavioral analysis, and risk scoring/clustering
+- Built models used for forecasting and risk scoring/clustering
+- Identified instances of double-billing resulting in a recovery of over $500k
 - Applied statistical methods, simulation, and data mining techniques to complex business questions
 - Designed staffing projection and service delivery estimation methodology
 - Automated interactive reports and dashboards supporting contact center operations
