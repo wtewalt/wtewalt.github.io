@@ -374,19 +374,9 @@
       color: var(--text-muted);
       margin-bottom: 0.5rem;
     }
-    .skill-pills {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.3rem;
-    }
-    .skill-pill {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 100px;
-      padding: 0.2rem 0.65rem;
-      font-size: 0.825rem;
-      color: var(--text);
-      transition: background 0.2s, border-color 0.2s;
+    .subchart-wrap {
+      position: relative;
+      width: 100%;
     }
 
     /* ── Footer ── */
@@ -676,89 +666,39 @@
       <div class="skills-grid">
         <div class="skill-group">
           <h4>Programming</h4>
-          <div class="skill-pills">
-            <span class="skill-pill">Python</span>
-            <span class="skill-pill">Go</span>
-            <span class="skill-pill">SQL</span>
-            <span class="skill-pill">JavaScript</span>
-            <span class="skill-pill">HCL (Terraform)</span>
-            <span class="skill-pill">Nix</span>
-          </div>
+          <div class="subchart-wrap" style="height:228px"><canvas id="subchart-programming"></canvas></div>
         </div>
         <div class="skill-group">
           <h4>Leadership</h4>
-          <div class="skill-pills">
-            <span class="skill-pill">Communication</span>
-            <span class="skill-pill">Conflict Resolution</span>
-            <span class="skill-pill">Decision-Making</span>
-            <span class="skill-pill">Strategic Planning</span>
-          </div>
+          <div class="subchart-wrap" style="height:160px"><canvas id="subchart-leadership"></canvas></div>
         </div>
         <div class="skill-group">
           <h4>Data Engineering</h4>
-          <div class="skill-pills">
-            <span class="skill-pill">Git</span>
-            <span class="skill-pill">Containers (Docker)</span>
-            <span class="skill-pill">Testing &amp; Debugging</span>
-            <span class="skill-pill">CI/CD</span>
-            <span class="skill-pill">Apache Airflow</span>
-            <span class="skill-pill">ETLs</span>
-            <span class="skill-pill">API Development</span>
-          </div>
+          <div class="subchart-wrap" style="height:262px"><canvas id="subchart-data-engineering"></canvas></div>
         </div>
         <div class="skill-group">
           <h4>Frameworks</h4>
-          <div class="skill-pills">
-            <span class="skill-pill">Flask</span>
-            <span class="skill-pill">FastAPI</span>
-            <span class="skill-pill">React</span>
-          </div>
+          <div class="subchart-wrap" style="height:126px"><canvas id="subchart-frameworks"></canvas></div>
         </div>
         <div class="skill-group">
           <h4>Cloud</h4>
-          <div class="skill-pills">
-            <span class="skill-pill">Serverless Compute</span>
-            <span class="skill-pill">S3 &amp; Data Lake</span>
-            <span class="skill-pill">IAM</span>
-            <span class="skill-pill">Secret Management</span>
-            <span class="skill-pill">API Gateway</span>
-          </div>
+          <div class="subchart-wrap" style="height:194px"><canvas id="subchart-cloud"></canvas></div>
         </div>
         <div class="skill-group">
           <h4>Data Analytics</h4>
-          <div class="skill-pills">
-            <span class="skill-pill">Visualization</span>
-            <span class="skill-pill">Power BI</span>
-            <span class="skill-pill">Tableau</span>
-          </div>
+          <div class="subchart-wrap" style="height:126px"><canvas id="subchart-data-analytics"></canvas></div>
         </div>
         <div class="skill-group">
           <h4>Data Science</h4>
-          <div class="skill-pills">
-            <span class="skill-pill">Optimization</span>
-            <span class="skill-pill">Forecasting</span>
-            <span class="skill-pill">NLP</span>
-            <span class="skill-pill">ML</span>
-            <span class="skill-pill">Media Attribution</span>
-          </div>
+          <div class="subchart-wrap" style="height:194px"><canvas id="subchart-data-science"></canvas></div>
         </div>
         <div class="skill-group">
           <h4>Databases</h4>
-          <div class="skill-pills">
-            <span class="skill-pill">BigQuery</span>
-            <span class="skill-pill">Redshift</span>
-            <span class="skill-pill">Athena</span>
-            <span class="skill-pill">PostgreSQL</span>
-          </div>
+          <div class="subchart-wrap" style="height:160px"><canvas id="subchart-databases"></canvas></div>
         </div>
         <div class="skill-group">
           <h4>AI</h4>
-          <div class="skill-pills">
-            <span class="skill-pill">MCP</span>
-            <span class="skill-pill">Prompt Engineering</span>
-            <span class="skill-pill">Tooling</span>
-            <span class="skill-pill">LLM Integration</span>
-          </div>
+          <div class="subchart-wrap" style="height:160px"><canvas id="subchart-ai"></canvas></div>
         </div>
       </div>
     </section>
@@ -854,10 +794,48 @@
     };
   }
 
+  const subSkillsData = [
+    { id: 'programming',      items: ['Python','Go','SQL','JavaScript','HCL (Terraform)','Nix'] },
+    { id: 'leadership',       items: ['Communication','Conflict Resolution','Decision-Making','Strategic Planning'] },
+    { id: 'data-engineering', items: ['Git','Containers (Docker)','Testing & Debugging','CI/CD','Apache Airflow','ETLs','API Development'] },
+    { id: 'frameworks',       items: ['Flask','FastAPI','React'] },
+    { id: 'cloud',            items: ['Serverless Compute','S3 & Data Lake','IAM','Secret Management','API Gateway'] },
+    { id: 'data-analytics',   items: ['Visualization','Power BI','Tableau'] },
+    { id: 'data-science',     items: ['Optimization','Forecasting','NLP','ML','Media Attribution'] },
+    { id: 'databases',        items: ['BigQuery','Redshift','Athena','PostgreSQL'] },
+    { id: 'ai',               items: ['MCP','Prompt Engineering','Tooling','LLM Integration'] },
+  ];
+
+  let subCharts = [];
+
+  function makeBarConfig(items) {
+    const c = getChartColors();
+    return {
+      type: 'bar',
+      data: {
+        labels: items,
+        datasets: [{ data: items.map(() => 7), backgroundColor: hexToRgba(c.accent, 0.7), borderColor: c.accent, borderWidth: 1, borderRadius: 4 }]
+      },
+      options: {
+        indexAxis: 'y',
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          x: { min: 0, max: 10, ticks: { stepSize: 2, color: c.tickColor, font: { size: 11 } }, grid: { color: c.gridColor } },
+          y: { ticks: { color: c.labelColor, font: { size: 12 } }, grid: { display: false } }
+        }
+      }
+    };
+  }
+
   function initCharts() {
     if (chartsInitialized) return;
     chartsInitialized = true;
     skillsChart = new Chart(document.getElementById('chart-skills'), makeConfig());
+    subCharts = subSkillsData.map(d =>
+      new Chart(document.getElementById('subchart-' + d.id), makeBarConfig(d.items))
+    );
   }
 
   function updateChartColors() {
@@ -871,6 +849,14 @@
     skillsChart.options.scales.r.angleLines.color = c.gridColor;
     skillsChart.options.scales.r.pointLabels.color = c.labelColor;
     skillsChart.update();
+    subCharts.forEach(chart => {
+      chart.data.datasets[0].backgroundColor = hexToRgba(c.accent, 0.7);
+      chart.data.datasets[0].borderColor = c.accent;
+      chart.options.scales.x.ticks.color = c.tickColor;
+      chart.options.scales.x.grid.color = c.gridColor;
+      chart.options.scales.y.ticks.color = c.labelColor;
+      chart.update();
+    });
   }
 </script>
 
