@@ -165,9 +165,22 @@
     .bio {
       font-size: 0.975rem;
       color: var(--text);
-      margin-bottom: 1.5rem;
+      margin-bottom: 1.25rem;
       line-height: 1.7;
     }
+
+    .gh-stats {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.5rem 1.25rem;
+      margin-bottom: 1.25rem;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+    .gh-stat strong { color: var(--accent); font-size: 1.1rem; font-weight: 700; }
+    .gh-stat { display: flex; align-items: center; gap: 0.3rem; }
+    .gh-source { font-size: 0.75rem; color: var(--text-muted); opacity: 0.7; }
 
     .callout {
       background: var(--surface);
@@ -465,6 +478,22 @@
       <p class="bio">
         Senior data and analytics leader with 10+ years of experience building production data infrastructure, ML systems, and AI-powered tools. Has led teams and initiatives spanning data engineering, data science, and full-stack software development across agency, startup, and enterprise environments. Builds things end-to-end: from Airflow pipelines and medallion architectures to recommendation systems, web apps, and LLM integrations. Currently targeting senior leadership roles in Data Engineering, Software Development, or DevOps.
       </p>
+
+      <div class="gh-stats" id="gh-stats">
+        <span class="gh-stat">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+          <strong id="gh-commits">—</strong> pushes
+        </span>
+        <span class="gh-stat">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h18v18H3z"/><path d="M3 9h18M9 21V9"/></svg>
+          <strong id="gh-repos">—</strong> repos
+        </span>
+        <span class="gh-stat">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          last <strong id="gh-days">—</strong> days
+        </span>
+        <span class="gh-source">(wtewalt · public repos)</span>
+      </div>
 
       <div class="callout">
         <h3>Currently open to</h3>
@@ -825,6 +854,32 @@
   }
 
   setDark(localStorage.getItem('dark') !== 'false');
+
+  // ── GitHub stats (public events, wtewalt) ──
+  (async function loadGitHubStats() {
+    try {
+      const res = await fetch('https://api.github.com/users/wtewalt/events?per_page=100');
+      if (!res.ok) throw new Error();
+      const events = await res.json();
+      const cutoff = new Date(Date.now() - 90 * 24 * 60 * 60 * 1000);
+      const recent = events.filter(e => new Date(e.created_at) >= cutoff);
+      let commits = 0;
+      const repos = new Set();
+      for (const e of recent) {
+        if (e.type === 'PushEvent') {
+          commits++;
+          repos.add(e.repo.name.split('/')[1]);
+        }
+      }
+      const oldest = recent.length ? new Date(recent[recent.length - 1].created_at) : null;
+      const days = oldest ? Math.ceil((Date.now() - oldest) / (1000 * 60 * 60 * 24)) : 90;
+      document.getElementById('gh-commits').textContent = commits;
+      document.getElementById('gh-repos').textContent = repos.size;
+      document.getElementById('gh-days').textContent = days;
+    } catch {
+      document.getElementById('gh-stats').style.display = 'none';
+    }
+  })();
 </script>
 
 </body>
