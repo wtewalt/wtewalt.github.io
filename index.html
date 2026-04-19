@@ -7,17 +7,7 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     /* ── CSS Variables ── */
-    /* github-light (default) */
-    :root, body.theme-github-light {
-      --bg: #ffffff;
-      --surface: #f6f8fa;
-      --border: #d0d7de;
-      --text: #24292f;
-      --text-muted: #57606a;
-      --accent: #0969da;
-      --bar-gradient: linear-gradient(to right, #cae8ff, #0550ae);
-    }
-    body.theme-tokyonight-day {
+    :root, body.theme-light {
       --bg: #e1e2e7;
       --surface: #d5d6db;
       --border: #c4c5d0;
@@ -26,16 +16,7 @@
       --accent: #2496fe;
       --bar-gradient: linear-gradient(to right, #b3e5fc, #0d47a1);
     }
-    body.theme-dracula {
-      --bg: #282a36;
-      --surface: #44475a;
-      --border: #6272a4;
-      --text: #f8f8f2;
-      --text-muted: #6272a4;
-      --accent: #bd93f9;
-      --bar-gradient: linear-gradient(to right, #f1fa8c, #bd93f9);
-    }
-    body.theme-catppuccin-mocha {
+    body.theme-dark {
       --bg: #1e1e2e;
       --surface: #313244;
       --border: #45475a;
@@ -88,17 +69,22 @@
       font-size: 1.1rem;
       color: var(--text);
     }
-    .theme-select {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      padding: 0.3rem 0.6rem;
-      cursor: pointer;
-      color: var(--text);
-      font-size: 0.85rem;
-      font-family: inherit;
-      transition: background 0.2s, border-color 0.2s, color 0.2s;
+    .toggle-switch { display: flex; align-items: center; gap: 0.5rem; cursor: pointer; }
+    .toggle-switch .toggle-label { font-size: 0.8rem; color: var(--text-muted); user-select: none; }
+    .toggle-track {
+      position: relative; width: 40px; height: 22px;
+      background: var(--border); border-radius: 999px;
+      transition: background 0.2s; flex-shrink: 0;
     }
+    .toggle-track.on { background: var(--accent); }
+    .toggle-thumb {
+      position: absolute; top: 3px; left: 3px;
+      width: 16px; height: 16px; border-radius: 50%;
+      background: #fff; transition: transform 0.2s;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+    }
+    .toggle-track.on .toggle-thumb { transform: translateX(18px); }
+
 
     /* ── Tabs ── */
     .tabs {
@@ -288,9 +274,10 @@
     /* ── Project Cards ── */
     .cards-grid {
       display: grid;
-      grid-template-columns: 1fr;
+      grid-template-columns: repeat(2, 1fr);
       gap: 1rem;
     }
+    @media (max-width: 600px) { .cards-grid { grid-template-columns: 1fr; } }
     .card {
       background: var(--surface);
       border: 1px solid var(--border);
@@ -299,26 +286,12 @@
       transition: background 0.2s, border-color 0.2s;
     }
     .card-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      gap: 0.5rem;
       margin-bottom: 0.6rem;
     }
     .card-title {
       font-weight: 700;
       font-size: 0.975rem;
       color: var(--text);
-    }
-    .duration-badge {
-      background: var(--bg);
-      border: 1px solid var(--border);
-      border-radius: 4px;
-      padding: 0.1rem 0.45rem;
-      font-size: 0.775rem;
-      color: var(--text-muted);
-      white-space: nowrap;
-      flex-shrink: 0;
     }
     .tags {
       display: flex;
@@ -422,16 +395,11 @@
 <header>
   <div class="container nav-inner">
     <span class="nav-logo">William Tewalt</span>
-    <select class="theme-select" id="theme-select" onchange="setTheme(this.value)">
-      <optgroup label="Light">
-        <option value="theme-github-light">GitHub Light</option>
-        <option value="theme-tokyonight-day">Tokyo Night Day</option>
-      </optgroup>
-      <optgroup label="Dark">
-        <option value="theme-dracula">Dracula</option>
-        <option value="theme-catppuccin-mocha">Catppuccin Mocha</option>
-      </optgroup>
-    </select>
+    <div class="toggle-switch" onclick="toggleTheme()">
+      <span class="toggle-label">☀</span>
+      <div class="toggle-track" id="toggle-track"><div class="toggle-thumb"></div></div>
+      <span class="toggle-label">☾</span>
+    </div>
   </div>
 </header>
 
@@ -591,7 +559,7 @@
         <div class="card">
           <div class="card-header">
             <span class="card-title">Campaign Optimization</span>
-            <span class="duration-badge">3 yr</span>
+
           </div>
           <div class="tags"><span class="tag">Data Science</span></div>
           <p class="card-desc">Self-hosted recommendation system automating bid and budget management across ~$4M annual ad spend; increased client ROAS by 10%.</p>
@@ -600,7 +568,7 @@
         <div class="card">
           <div class="card-header">
             <span class="card-title">Data Pipelines</span>
-            <span class="duration-badge">5 yr</span>
+
           </div>
           <div class="tags"><span class="tag">Data Engineering</span></div>
           <p class="card-desc">Apache Airflow orchestration ingesting data from dozens of sources (CRMs, ad platforms, SFTP, APIs); backed by custom Python packaging and cloud infra.</p>
@@ -609,7 +577,7 @@
         <div class="card">
           <div class="card-header">
             <span class="card-title">Data Management</span>
-            <span class="duration-badge">5 yr</span>
+
           </div>
           <div class="tags"><span class="tag">Data Engineering</span></div>
           <p class="card-desc">Medallion architecture across AWS Redshift, PostgreSQL, and BigQuery; implemented SQLMesh org-wide for data lineage and isolated dev/prod environments.</p>
@@ -618,7 +586,7 @@
         <div class="card">
           <div class="card-header">
             <span class="card-title">Web App</span>
-            <span class="duration-badge">3 yr</span>
+
           </div>
           <div class="tags"><span class="tag">Software Engineering</span></div>
           <p class="card-desc">Full-stack app in Django + React for hosting internal data science tools; integrated with internal and external APIs.</p>
@@ -627,7 +595,7 @@
         <div class="card">
           <div class="card-header">
             <span class="card-title">AI Chat Interface</span>
-            <span class="duration-badge">1 yr</span>
+
           </div>
           <div class="tags"><span class="tag">GenAI</span><span class="tag">Data Engineering</span></div>
           <p class="card-desc">MCP-based tool enabling Claude AI to directly query and interact with internal database tables.</p>
@@ -636,7 +604,7 @@
         <div class="card">
           <div class="card-header">
             <span class="card-title">Ad Generation</span>
-            <span class="duration-badge">3 yr</span>
+
           </div>
           <div class="tags"><span class="tag">GenAI</span><span class="tag">Data Engineering</span></div>
           <p class="card-desc">LLM-driven generation of search ad copy using dynamic performance data; custom web UI with user-defined theme inputs.</p>
@@ -645,7 +613,7 @@
         <div class="card">
           <div class="card-header">
             <span class="card-title">Geo-Targeting</span>
-            <span class="duration-badge">2 yr</span>
+
           </div>
           <div class="tags"><span class="tag">Data Science</span><span class="tag">Data Engineering</span></div>
           <p class="card-desc">Geospatial + Google Places API tool tracking business rankings across city subsections over time; cloud object storage for pipeline I/O.</p>
@@ -654,7 +622,7 @@
         <div class="card">
           <div class="card-header">
             <span class="card-title">Timeo</span>
-            <span class="duration-badge">—</span>
+
           </div>
           <div class="tags"><span class="tag">Open Source</span></div>
           <p class="card-desc">Python package published on PyPI. <a href="https://pypi.org/project/timeo/" target="_blank" rel="noopener">View on PyPI →</a></p>
@@ -747,16 +715,14 @@
   }
 
   // ── Theme ──
-  const THEMES = ['theme-github-light','theme-tokyonight-day','theme-dracula','theme-catppuccin-mocha'];
-  function setTheme(name) {
-    document.body.classList.remove(...THEMES);
-    document.body.classList.add(name);
-    localStorage.setItem('theme', name);
+  function setDark(dark) {
+    document.body.classList.toggle('theme-dark', dark);
+    document.body.classList.toggle('theme-light', !dark);
+    document.getElementById('toggle-track').classList.toggle('on', dark);
+    localStorage.setItem('dark', dark);
     updateChartColors();
   }
-  const savedTheme = localStorage.getItem('theme') || 'theme-github-light';
-  document.body.classList.add(savedTheme);
-  document.getElementById('theme-select').value = savedTheme;
+  function toggleTheme() { setDark(!document.body.classList.contains('theme-dark')); }
 
   // ── Chart.js ──
   const skillsData = {
@@ -833,6 +799,8 @@
     skillsChart.options.scales.r.pointLabels.color = c.labelColor;
     skillsChart.update();
   }
+
+  setDark(localStorage.getItem('dark') !== 'false');
 </script>
 
 </body>
