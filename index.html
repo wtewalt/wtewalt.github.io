@@ -15,6 +15,7 @@
       --text: #24292f;
       --text-muted: #57606a;
       --accent: #0969da;
+      --bar-gradient: linear-gradient(to right, #79c0ff, #0969da);
     }
     body.theme-tokyonight-day {
       --bg: #e1e2e7;
@@ -23,6 +24,7 @@
       --text: #3760bf;
       --text-muted: #6172b0;
       --accent: #2496fe;
+      --bar-gradient: linear-gradient(to right, #7dcfff, #2496fe);
     }
     body.theme-dracula {
       --bg: #282a36;
@@ -31,6 +33,7 @@
       --text: #f8f8f2;
       --text-muted: #6272a4;
       --accent: #bd93f9;
+      --bar-gradient: linear-gradient(to right, #8be9fd, #bd93f9);
     }
     body.theme-monokai {
       --bg: #272822;
@@ -39,6 +42,7 @@
       --text: #f8f8f2;
       --text-muted: #75715e;
       --accent: #a6e22e;
+      --bar-gradient: linear-gradient(to right, #66d9e8, #a6e22e);
     }
 
     /* ── Base ── */
@@ -380,7 +384,7 @@
     .bar-item { margin-bottom: 0.6rem; }
     .bar-label { display: block; font-size: 0.825rem; color: var(--text); margin-bottom: 0.2rem; }
     .bar-track { background: var(--border); border-radius: 4px; height: 8px; }
-    .bar-fill   { background: var(--accent); border-radius: 4px; height: 100%; transition: width 0.3s; }
+    .bar-fill   { background: var(--bar-gradient); border-radius: 4px; height: 100%; transition: width 0.3s; }
 
     /* ── Footer ── */
     footer {
