@@ -1,72 +1,96 @@
 # CLAUDE.md — Personal Profile Site
 
-Read this file fully before writing any code. It contains all source content, design decisions, and a step-by-step implementation plan. Execute steps in order.
+Read this file fully before writing any code. It is the authoritative reference for content, design decisions, and current implementation state.
 
 ---
 
 ## Goal
 
-Build a polished single-page personal profile site for **William Tewalt** hosted on GitHub Pages. The purpose is to get William hired into a senior leadership role in Data Engineering, Software Development, or Data. The site should feel professional, modern, and technically credible.
+A polished single-page personal profile site for **William Tewalt** hosted on GitHub Pages (`https://wtewalt.github.io`). Purpose: get William hired into a senior leadership role in Data Engineering, Software Development, or Data. Professional, modern, technically credible.
 
 ---
 
 ## Deliverables
 
-- `index.html` — single file, no build step required, served directly by GitHub Pages
-- `flake.nix` — Nix dev shell that serves the site locally (e.g., with `python3 -m http.server` or similar)
+- `index.html` — single file at repo root, no build step, served by GitHub Pages
+- `flake.nix` — Nix dev shell with a `serve` command (`python3 -m http.server 8080`)
+- `skills.yaml` — source of truth for Skills tab data (see below)
 
-No bundler, no npm, no build step. All JS loaded from CDN or inlined.
+No bundler, no npm, no build step. All JS inlined or loaded from CDN.
 
 ---
 
 ## Tech Stack
 
-- **Chart.js** (`https://cdn.jsdelivr.net/npm/chart.js`) — radar charts for skill domains
-- **CSS** — custom, no framework. Use CSS variables for theming. No Tailwind, no Bootstrap.
-- **HTML5** — semantic markup, `index.html` at repo root
+- **Chart.js** (`https://cdn.jsdelivr.net/npm/chart.js`) — single radar chart on Skills tab
+- **CSS** — custom, no framework. CSS variables for theming.
+- **HTML5** — semantic markup, vanilla JS only
+- **No icon library** — inline SVG only (heroicons outline style)
 
 ---
 
 ## Site Structure
 
-Four tabs, all rendered in the DOM simultaneously (no fetch needed), toggled with vanilla JS:
+Four tabs toggled with vanilla JS (`switchTab(name)`), all sections rendered in DOM simultaneously:
 
-1. **About Me** — default/landing tab
+1. **About Me** — default tab
 2. **Work History** — employment timeline
-3. **Projects** — project cards
-4. **Skills** — radar charts per domain
+3. **Projects** — 2-column card grid
+4. **Skills** — radar chart + sub-skill bar charts
+
+Tab state is not persisted. Page always opens on About Me.
 
 ---
 
-## Design Requirements
+## Theme System
 
-- Theme selector (CSS variables + vanilla JS, persisted to `localStorage`)
-  - Light: GitHub Light, Tokyo Night Day
-  - Dark: Dracula, Monokai
-- Clean, minimal aesthetic — no excessive color, no gradients
-- Profile photo (`self_pic.png`) displayed in the About Me tab
-- Responsive: readable on mobile and desktop
-- Tab navigation at the top, active tab highlighted
-- No animations beyond simple CSS transitions on tab/theme toggle
+**Two themes only**, toggled with a CSS toggle switch (☀ / ☾) in the nav bar. Dark is the default.
 
-### Color scheme (CSS variables)
+| Theme | Class on `<body>` | Description |
+|---|---|---|
+| Tokyo Night Day | `theme-light` | Light mode |
+| Catppuccin Mocha | `theme-dark` | Dark mode (default) |
+
+Persisted to `localStorage` under key `'dark'` (string `'true'`/`'false'`). Default dark: `localStorage.getItem('dark') !== 'false'`.
+
+### CSS Variables
 
 ```css
-/* Light mode */
---bg: #f9f9f7;
---surface: #ffffff;
---border: #e0e0e0;
---text: #1a1a1a;
---text-muted: #666666;
---accent: #2c6fad;
+:root, body.theme-light {
+  --bg: #e1e2e7;
+  --surface: #d5d6db;
+  --border: #c4c5d0;
+  --text: #3760bf;
+  --text-muted: #6172b0;
+  --accent: #2496fe;
+  --bar-gradient: linear-gradient(to right, #b3e5fc, #0d47a1);
+}
+body.theme-dark {
+  --bg: #1e1e2e;
+  --surface: #313244;
+  --border: #45475a;
+  --text: #cdd6f4;
+  --text-muted: #6c7086;
+  --accent: #cba6f7;
+  --bar-gradient: linear-gradient(to right, #89dceb, #cba6f7);
+}
+```
 
-/* Dark mode */
---bg: #111111;
---surface: #1e1e1e;
---border: #333333;
---text: #f0f0f0;
---text-muted: #999999;
---accent: #5b9bd5;
+### JS — Critical ordering constraint
+
+`setDark(localStorage.getItem('dark') !== 'false')` **must be called after all `let` chart variable declarations** to avoid a temporal dead zone ReferenceError. It is placed at the very end of the `<script>` block.
+
+```js
+function setDark(dark) {
+  document.body.classList.toggle('theme-dark', dark);
+  document.body.classList.toggle('theme-light', !dark);
+  document.getElementById('toggle-track').classList.toggle('on', dark);
+  localStorage.setItem('dark', dark);
+  updateChartColors();
+}
+function toggleTheme() { setDark(!document.body.classList.contains('theme-dark')); }
+// ... all chart let declarations and functions must come before this line:
+setDark(localStorage.getItem('dark') !== 'false');
 ```
 
 ---
@@ -80,28 +104,24 @@ Four tabs, all rendered in the DOM simultaneously (no fetch needed), toggled wit
 | Name | William Tewalt |
 | Location | Signal Mountain, Tennessee |
 | Email | wtewalt@gmail.com |
-| Phone | 301-991-4186 |
 | LinkedIn | linkedin.com/in/william-tewalt |
 | GitHub | github.com/wtewalt |
 | GitHub (work) | github.com/WilliamTewaltEPL |
 
-### About Me (compose from resume — do not copy verbatim)
+Both GitHub accounts are displayed in the About Me tab. Phone number is intentionally omitted from the page.
 
-William is a senior data and analytics leader with 10+ years of experience building production data infrastructure, ML systems, and AI-powered tools. He has led teams and initiatives spanning data engineering, data science, and full-stack software development across agency, startup, and enterprise environments. He builds things end-to-end: from Airflow pipelines and medallion architectures to recommendation systems, web apps, and LLM integrations. Currently targeting senior leadership roles in Data Engineering, Software Development, or Data.
+### About Me Bio
 
-### Skills
+Senior data and analytics leader with 10+ years of experience building production data infrastructure, ML systems, and AI-powered tools. Has led teams and initiatives spanning data engineering, data science, and full-stack software development across agency, startup, and enterprise environments. Builds things end-to-end: from Airflow pipelines and medallion architectures to recommendation systems, web apps, and LLM integrations. Currently targeting senior leadership roles in Data Engineering, Software Development, or DevOps.
 
-Radar chart data comes from `skills.yaml` in the repo root. Read that file at implementation time — do not hard-code the values here. The format is `domain: { skill: score }` where scores are out of 10. Each top-level key becomes its own radar chart.
+### Currently Open To (callout box)
 
-Also surface these from the resume as text (not on radar charts — too many items):
-- **Cloud & Infra**: AWS (Lambda, Redshift, S3), GCP (BigQuery, GCS), Docker, Terraform, CI/CD
-- **Data Engineering**: Apache Airflow, SQLMesh, dbt, ETL/ELT, Medallion Architecture
-- **Data Science & ML**: Recommendation Systems, Predictive Modeling, Media Attribution, NLP, Forecasting
-- **AI & GenAI**: LLM Integration, Prompt Engineering, MCP Development
-- **Databases**: PostgreSQL, AWS Redshift, Google BigQuery
-- **Visualization**: Power BI, Tableau, Geospatial Visualization
+- Sr. Director / VP of Data Engineering
+- Sr. Director / VP of Software Development
+- Head of Data / Chief Data Officer
+- Principal Data Engineer
 
-### Work History (chronological, most recent first)
+### Work History (most recent first)
 
 **EPL Digital + AttorneySync**
 - Sr. Director of Data & Analytics — 2025–Present
@@ -116,7 +136,7 @@ Also surface these from the resume as text (not on radar charts — too many ite
 **The Johnson Group**
 - Director of Analytics — 2020
 - Manager, Advanced Analytics — 2017–2020
-- Built and orchestrated automated data pipelines with  Python and Apache Airflow 
+- Built and orchestrated automated data pipelines with Python and Apache Airflow
 - Developed media attribution models guiding optimization of millions in annual ad spend
 - Designed and maintained PostgreSQL database as foundation for company-wide analytics
 - Established scalable development guidelines enabling efficient cross-team support
@@ -139,104 +159,68 @@ Also surface these from the resume as text (not on radar charts — too many ite
 - Designed staffing projection and service delivery estimation methodology
 - Automated interactive reports and dashboards supporting contact center operations
 
-### Projects (display as cards)
+### Projects (2-column card grid, no duration badges)
 
-| Project | Tags | Duration | Description |
+Each card has: inline SVG icon, title, tag pills, description.
+
+| Project | Icon | Tags | Description |
 |---|---|---|---|
-| Campaign Optimization | Data Science | 3 yr | Self-hosted recommendation system automating bid and budget management across ~$4M annual ad spend; increased client ROAS by 10% |
-| Data Pipelines | Data Engineering | 5 yr | Apache Airflow orchestration ingesting data from dozens of sources (CRMs, ad platforms, SFTP, APIs); backed by custom Python packaging and cloud infra |
-| Data Management | Data Engineering | 5 yr | Medallion architecture across AWS Redshift, PostgreSQL, and BigQuery; implemented SQLMesh org-wide for data lineage and isolated dev/prod environments |
-| Web App | Software Engineering | 3 yr | Full-stack app in Django + Next.js for hosting internal data science tools; integrated with internal and external APIs |
-| AI Chat Interface | GenAI · Data Engineering | 1 yr | MCP-based tool enabling Claude AI to directly query and interact with internal database tables |
-| Ad Generation | GenAI · Data Engineering | 3 yr | LLM-driven generation of search ad copy using dynamic performance data; custom web UI with user-defined theme inputs |
-| Geo-Targeting | Data Science · Data Engineering | 2 yr | Geospatial + Google Places API tool tracking business rankings across city subsections over time; cloud object storage for pipeline I/O |
-| Timeo | Open Source | — | Python package published on PyPI. Link: https://pypi.org/project/timeo/ |
+| Campaign Optimization | trending-up | Data Science | Self-hosted recommendation system automating bid and budget management across ~$4M annual ad spend; increased client ROAS by 20% |
+| Data Pipelines | arrows swap | Data Engineering | Apache Airflow orchestration. Data from dozens of sources (CRMs, ad platforms, SFTP, APIs). Custom Python packaging and cloud infra |
+| Data Management | database cylinders | Data Engineering | Medallion architecture across AWS Redshift, PostgreSQL, and BigQuery; implemented SQLMesh org-wide for data lineage and isolated dev/prod environments |
+| Web App | computer-desktop | Software Engineering | Full-stack app in Django + React for hosting internal data science tools; integrated with internal and external APIs |
+| AI Chat Interface | chat bubble | GenAI, Data Engineering | MCP-based tool enabling Claude AI to directly query and interact with internal database tables |
+| Ad Generation | sparkles | GenAI, Data Engineering | LLM-driven generation of search ad copy using dynamic performance data; custom web UI with user-defined theme inputs |
+| Geo-Targeting | map pin | Data Science, Data Engineering | Geospatial + Google Places API tool tracking business rankings across city subsections over time; cloud object storage for pipeline I/O |
+| Timeo | clock | Open Source | Python package published on PyPI. Link: https://pypi.org/project/timeo/ |
 
 ---
 
-## Implementation Plan
+## Skills Tab
 
-Execute each step fully before moving to the next.
+### skills.yaml — Source of Truth
 
-### STEP-01 — HTML skeleton
+`skills.yaml` defines all skills data. When it changes, update `index.html` manually in three places:
 
-Create `index.html` with:
-- `<head>`: charset, viewport, title ("William Tewalt"), CDN link for Chart.js, inline `<style>` block (empty for now)
-- `<body>` with vanilla JS handling tab state and dark mode
-- Top nav bar: name/logo left, theme toggle button right
-- Tab buttons: About Me, Work History, Skills — each sets `tab` signal on click
-- Three `<section>` elements with `data-show` bound to the `tab` signal
-- Footer with email and LinkedIn
+1. **`skillsData.labels`** — array of top-level domain names (must match yaml keys exactly)
+2. **`skillsData.scores`** — array of domain scores (same order as labels)
+3. **Sub-skill bar HTML** — each `<div class="skill-group">` block: the `<h4>` heading and each `bar-item`'s label, bar width (`style="width:X0%"`), and score
 
-Done when: page loads, tabs switch, no JS errors in console.
+### Current skills.yaml values
 
-### STEP-02 — CSS (light + dark theme)
+Domains and scores (order matches radar chart labels):
+- Programming: 8
+- Leadership: 9.5
+- Data Engr.: 8.5
+- Cloud: 8
+- Data Science: 7.5
+- AI: 7.5
 
-Fill the `<style>` block with:
-- CSS variables for light mode (`:root`) and dark mode (`.dark` on `<body>`)
-- Dark mode: `toggleDark()` adds/removes `.dark` class on `<body>`
-- Base styles: body, fonts (system font stack), layout (max-width ~900px, centered)
-- Nav bar styles
-- Tab button styles with active state
-- Section layout
-- Responsive: single-column on mobile
+### Radar Chart
 
-Done when: light/dark toggle works; `localStorage` preference restored on page load.
+- Single Chart.js radar, `max: 10`, `responsive: true`, no legend
+- Max-width 560px, centered above the sub-skill bars
+- Colors read from CSS variables via `getComputedStyle` — updates on theme toggle
+- `hexToRgba()` helper converts `--accent` hex to rgba for `backgroundColor`
 
-### STEP-03 — About Me tab
+### Sub-skill Bars
 
-Content:
-- Profile photo (`self_pic.png`) — circular, ~120px, floated or flexed alongside intro text
-- Name as `<h1>`, title as subtitle ("Sr. Director of Data & Analytics")
-- Location, email (mailto link), LinkedIn, GitHub links with simple icons (use Unicode or inline SVG — no icon library)
-- Bio paragraph (from About Me section above)
-- A "Currently open to" callout box listing target roles
-
-Done when: tab renders cleanly in both light and dark mode with photo.
-
-### STEP-04 — Work History tab
-
-Render as a vertical timeline:
-- Each employer as a block with company name, title(s), and date range
-- Bullet points for responsibilities (from Work History section above)
-- If a person held multiple titles at one employer, show them stacked with their individual date ranges
-
-Done when: all employers render, dates are correct.
-
-### STEP-04b — Projects tab
-
-Project cards in a responsive grid (from Projects table above) — each card has title, tag pills, duration badge, and description.
-
-Done when: all 8 project cards render cleanly.
-
-### STEP-05 — Skills tab
-
-Read `skills.yaml`. Each top-level key has a `score` (out of 10) and a `sub-skills` list.
-
-- One radar chart with all top-level skill domains as labels and their scores as values (centered, max-width 560px)
-- Below: sub-skills grouped under their parent domain as pill tags
-
-Chart: Chart.js radar type, max scale 10, filled with accent color at 0.2 opacity. Colors read from CSS variables so they update automatically on theme change.
-
-Done when: chart renders for all themes, sub-skill pills display below grouped correctly.
-
-### STEP-06 — Polish and Nix flake
-
-- Audit all content for typos against source material
-- Ensure dark/light transition is smooth (CSS `transition: background 0.2s, color 0.2s`)
-- Ensure Chart.js legend and grid colors adapt to theme
-- Check mobile layout on a narrow viewport
-- Write `flake.nix` with a dev shell that runs `python3 -m http.server 8080` in the repo root when entering the shell (or provide a `serve` command)
-
-Done when: `nix develop` drops into a shell with a `serve` command; site looks correct in both themes on desktop and mobile.
+- Pure CSS horizontal bars — **no Chart.js** for sub-skills
+- 3-column grid (`.skills-grid`), 1-column on mobile (≤700px)
+- No "Sub-skills" section header
+- Each group: `<h4>` domain name (uppercase via CSS), then bar items
+- Bar structure: label above, bar track + score to the right on same row
+- Bar height: 8px; label font-size: 0.775rem; `margin-bottom: 0.35rem` per item
+- Bar fill uses `--bar-gradient`; score displayed outside the bar
 
 ---
 
 ## Constraints
 
-- No external fonts (use system font stack: `-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif`)
+- No external fonts — system font stack: `-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif`
 - No bundler, no build step, no npm
-- All JS must be in `index.html` or loaded from CDN — no separate `.js` files
-- `index.html` must be at repo root for GitHub Pages
+- No icon libraries — inline SVG only
+- All JS in `index.html` or from CDN — no separate `.js` files
+- `index.html` at repo root for GitHub Pages
 - Do not invent or embellish resume content — use only what is in this file
-- Do not include phone number on the page (keep it off the public web)
+- Do not include phone number on the page
